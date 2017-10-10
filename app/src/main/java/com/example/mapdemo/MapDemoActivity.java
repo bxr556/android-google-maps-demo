@@ -1,13 +1,19 @@
 package com.example.mapdemo;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -24,9 +30,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.maps.android.ui.IconGenerator;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -34,7 +45,7 @@ import permissions.dispatcher.RuntimePermissions;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 @RuntimePermissions
-public class MapDemoActivity extends AppCompatActivity {
+public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMapLongClickListener {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -85,6 +96,7 @@ public class MapDemoActivity extends AppCompatActivity {
         if (map != null) {
             // Map is ready
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
+            map.setOnMapLongClickListener(this);
             MapDemoActivityPermissionsDispatcher.getMyLocationWithCheck(this);
             MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithCheck(this);
         } else {
@@ -222,6 +234,58 @@ public class MapDemoActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putParcelable(KEY_LOCATION, mCurrentLocation);
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Toast.makeText(this, "Long Press", Toast.LENGTH_SHORT).show();
+        showAlertDialogForPoint(latLng);
+    }
+
+    private void showAlertDialogForPoint(final LatLng latLng) {
+        View messageView = LayoutInflater.from(MapDemoActivity.this).inflate(R.layout.message_item,null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(messageView);
+
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"OK", new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+                String title = ((EditText)alertDialog.findViewById(R.id.etTitle)).getText().toString();
+                String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).getText().toString();
+                Marker marker = map.addMarker(new MarkerOptions().position(latLng).title(title).snippet(snippet).icon(defaultMarker));
+            }
+        });
+
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,"Cancel",
+                new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int id){
+                        //dialog.cancel();
+                        IconGenerator iconGenerator = new IconGenerator(MapDemoActivity.this);
+
+// Possible color options:
+// STYLE_WHITE, STYLE_RED, STYLE_BLUE, STYLE_GREEN, STYLE_PURPLE, STYLE_ORANGE
+                        iconGenerator.setStyle(IconGenerator.STYLE_GREEN);
+// Swap text here to live inside speech bubble
+                        Bitmap bitmap = iconGenerator.makeIcon("Just testing");
+// Use BitmapDescriptorFactory to create the marker
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
+                        Marker mapMarker = map.addMarker(new MarkerOptions().
+// add options here
+                                position(latLng).title("My title").snippet("my snippet")
+
+                                .icon(icon));
+                    }
+                });
+
+
+        alertDialog.show();
+
+
+
     }
 
     // Define a DialogFragment that displays the error dialog
