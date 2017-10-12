@@ -25,5 +25,8 @@ dependencies {
     compile 'com.github.hotchemi:permissionsdispatcher:2.4.0'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
     compile 'com.google.maps.android:android-maps-utils:0.5+'
+    compile 'com.parse.bolts:bolts-android:1.4.0'
+    compile 'com.parse:parse-android:1.16.3'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
 
 }

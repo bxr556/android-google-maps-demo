@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.ui.IconGenerator;
+import com.parse.ParsePush;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -56,6 +57,7 @@ public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMa
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
 
     private final static String KEY_LOCATION = "location";
+    public static final String CHANNEL_NAME ="android-2017";
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -67,6 +69,8 @@ public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_demo_activity);
+
+        ParsePush.subscribeInBackground(CHANNEL_NAME);
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -241,6 +245,7 @@ public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMa
     @Override
     public void onMapLongClick(LatLng latLng) {
         Toast.makeText(this, "Long Press", Toast.LENGTH_SHORT).show();
+        PushTest.sendPushTest();
         showAlertDialogForPoint(latLng);
     }
 
