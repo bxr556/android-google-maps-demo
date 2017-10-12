@@ -42,10 +42,11 @@ import com.google.maps.android.ui.IconGenerator;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
+import static com.example.mapdemo.MapUtils.addMarker;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 @RuntimePermissions
-public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMapLongClickListener {
+public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMapLongClickListener,GoogleMap.OnMarkerDragListener{
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -97,6 +98,7 @@ public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMa
             // Map is ready
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             map.setOnMapLongClickListener(this);
+            map.setOnMarkerDragListener(this);
             MapDemoActivityPermissionsDispatcher.getMyLocationWithCheck(this);
             MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithCheck(this);
         } else {
@@ -256,7 +258,10 @@ public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMa
                 BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
                 String title = ((EditText)alertDialog.findViewById(R.id.etTitle)).getText().toString();
                 String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).getText().toString();
-                Marker marker = map.addMarker(new MarkerOptions().position(latLng).title(title).snippet(snippet).icon(defaultMarker));
+                //Marker marker = map.addMarker(new MarkerOptions().position(latLng).title(title).snippet(snippet).icon(defaultMarker));
+                //marker.setDraggable(true);
+                addMarker(map,latLng,title,snippet,defaultMarker);
+
             }
         });
 
@@ -285,6 +290,21 @@ public class MapDemoActivity extends AppCompatActivity implements GoogleMap.OnMa
         alertDialog.show();
 
 
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
 
     }
 
